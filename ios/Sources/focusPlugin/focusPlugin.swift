@@ -1,23 +1,32 @@
-import Foundation
 import Capacitor
+import DeviceActivity
+import FamilyControls
+import UIKit
 
-/**
- * Please read the Capacitor iOS Plugin Development Guide
- * here: https://capacitorjs.com/docs/plugins/ios
- */
-@objc(focusPlugin)
-public class focusPlugin: CAPPlugin, CAPBridgedPlugin {
-    public let identifier = "focusPlugin"
-    public let jsName = "focus"
-    public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise)
-    ]
-    private let implementation = focus()
+@objc public class FocusPlugin: CAPPlugin {
 
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
+    @objc public func enableFocusModeAccess(_ call: CAPPluginCall) {
+        // Check if ScreenTime/Focus access is granted
+        FamilyControls.requestAuthorization { status, error in
+            if status == .authorized {
+                // If authorized, allow blocking apps
+                call.resolve([
+                    "status": "Focus mode access granted."
+                ])
+            } else {
+                // Handle case where permission is denied
+                call.reject("Focus mode access denied", error?.localizedDescription ?? "No error message")
+            }
+        }
+    }
+    
+    // Method to disable app switching or apply restrictions (for the Focus mode)
+    @objc public func disableAppSwitching(_ call: CAPPluginCall) {
+        // Placeholder for logic to block apps or disable switching
+        // Can be implemented by interacting with FamilyControls or DeviceActivity
+        // Example: Apply restrictions based on app usage
         call.resolve([
-            "value": implementation.echo(value)
+            "status": "App switching disabled"
         ])
     }
 }

@@ -1,10 +1,24 @@
-import { registerPlugin } from '@capacitor/core';
+import { WebPlugin } from '@capacitor/core';
 
-import type { focusPlugin } from './definitions';
+export interface FocusLockPlugin {
+  requestScreenTimeAccess(): Promise<void>;
+  startFocusMode(): Promise<void>;
+  stopFocusMode(): Promise<void>;
+}
 
-const focus = registerPlugin<focusPlugin>('focus', {
-  web: () => import('./web').then((m) => new m.focusWeb()),
-});
+export class FocusLockWeb extends WebPlugin implements FocusLockPlugin {
+  async requestScreenTimeAccess(): Promise<void> {
+    console.log('Screen Time access requested (web)');
+  }
 
-export * from './definitions';
-export { focus };
+  async startFocusMode(): Promise<void> {
+    console.log('Focus mode started (web)');
+  }
+
+  async stopFocusMode(): Promise<void> {
+    console.log('Focus mode stopped (web)');
+  }
+}
+
+const FocusLock = new FocusLockWeb();
+export { FocusLock };
